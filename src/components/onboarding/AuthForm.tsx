@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
-import { ArrowLeft, Eye, EyeOff, Lock, Mail, User, Phone, Globe, Key } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Lock, Mail, User, Phone, Globe } from 'lucide-react';
 import axios from 'axios';
 
 interface AuthFormProps {
@@ -105,9 +105,9 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Conditional rendering for Sign Up fields */}
         {!isLogin && (
           <>
-            {/* Full Name and Username */}
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
                 Full Name
@@ -138,7 +138,6 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
               {errors.username && <p className="mt-1 text-sm text-red-600">{errors.username}</p>}
             </div>
 
-            {/* Referral Code */}
             <div>
               <label htmlFor="referralCode" className="block text-sm font-medium text-gray-700">
                 Referral Code (Optional)
@@ -156,7 +155,7 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
           </>
         )}
 
-        {/* Email and Password */}
+        {/* Email */}
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email Address
@@ -172,6 +171,7 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
           {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
         </div>
 
+        {/* Password */}
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
             Password
@@ -202,6 +202,19 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
         >
           {isLogin ? 'Sign In' : 'Create Account'}
         </button>
+
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setErrors({});
+            }}
+            className="text-sm text-blue-600 hover:text-blue-500"
+          >
+            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+          </button>
+        </div>
       </form>
     </div>
   );
