@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { ArrowLeft, Eye, EyeOff, Lock, Mail, User, Phone, Globe, Key } from 'lucide-react';
+import axios from 'axios';
 
 interface AuthFormProps {
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess: (data: any) => void;
 }
 
 const signupSchema = z.object({
@@ -14,7 +15,8 @@ const signupSchema = z.object({
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   country: z.string().min(1, 'Please select your country'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  transferPin: z.string().length(6, 'Transfer PIN must be exactly 6 digits')
+  transferPin: z.string().length(6, 'Transfer PIN must be exactly 6 digits'),
+  referralCode: z.string().optional(),
 });
 
 const loginSchema = z.object({
@@ -43,19 +45,27 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
     phone: '',
     country: '',
     password: '',
-    transferPin: ''
+    transferPin: '',
+    referralCode: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let validatedData: SignupFormData | LoginFormData;
+
       if (isLogin) {
-        loginSchema.parse(formData);
+        validatedData = loginSchema.parse(formData);
       } else {
-        signupSchema.parse(formData);
+        validatedData = signupSchema.parse(formData);
       }
-      console.log('Form submitted:', formData);
-      onSuccess();
+
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const endpoint = isLogin ? '/auth/login' : '/auth/register';
+      const response = await axios.post(`${apiUrl}${endpoint}`, validatedData);
+
+      console.log('Form submitted successfully:', response.data);
+      onSuccess(response.data);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const formattedErrors: Partial<SignupFormData & LoginFormData> = {};
@@ -65,6 +75,8 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
           }
         });
         setErrors(formattedErrors);
+      } else if (axios.isAxiosError(error)) {
+        setErrors({ global: error.response?.data?.message || 'Something went wrong. Please try again.' });
       }
     }
   };
@@ -100,102 +112,66 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
                 Full Name
               </label>
-              <div className="mt-1 relative">
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 border ${
-                    errors.fullName ? 'border-red-300' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
-                </div>
-              </div>
-              {errors.fullName && (
-                <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
-              )}
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                className={`block w-full mt-1 border ${errors.fullName ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+              />
+              {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
             </div>
 
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                 Username
               </label>
-              <div className="mt-1 relative">
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 border ${
-                    errors.username ? 'border-red-300' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
-                </div>
-              </div>
-              {errors.username && (
-                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
-              )}
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className={`block w-full mt-1 border ${errors.username ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+              />
+              {errors.username && <p className="mt-1 text-sm text-red-600">{errors.username}</p>}
             </div>
 
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
                 Phone Number
               </label>
-              <div className="mt-1 relative">
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 border ${
-                    errors.phone ? 'border-red-300' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
-                </div>
-              </div>
-              {errors.phone && (
-                <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-              )}
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className={`block w-full mt-1 border ${errors.phone ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+              />
+              {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
             </div>
 
             <div>
               <label htmlFor="country" className="block text-sm font-medium text-gray-700">
                 Country
               </label>
-              <div className="mt-1 relative">
-                <select
-                  id="country"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 border ${
-                    errors.country ? 'border-red-300' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                >
-                  <option value="">Select your country</option>
-                  {countries.map((country) => (
-                    <option key={country} value={country}>
-                      {country}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Globe className="h-5 w-5 text-gray-400" />
-                </div>
-              </div>
-              {errors.country && (
-                <p className="mt-1 text-sm text-red-600">{errors.country}</p>
-              )}
+              <select
+                id="country"
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+                className={`block w-full mt-1 border ${errors.country ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+              >
+                <option value="">Select your country</option>
+                {countries.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
+              </select>
+              {errors.country && <p className="mt-1 text-sm text-red-600">{errors.country}</p>}
             </div>
           </>
         )}
@@ -204,24 +180,15 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email Address
           </label>
-          <div className="mt-1 relative">
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={`block w-full pl-10 pr-3 py-2 border ${
-                errors.email ? 'border-red-300' : 'border-gray-300'
-              } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-            />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5 text-gray-400" />
-            </div>
-          </div>
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-          )}
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`block w-full mt-1 border ${errors.email ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+          />
+          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
         </div>
 
         <div>
@@ -235,79 +202,39 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`block w-full pl-10 pr-10 py-2 border ${
-                errors.password ? 'border-red-300' : 'border-gray-300'
-              } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
+              className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? 'border-red-300' : 'border-gray-300'} rounded-md`}
             />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-gray-400" />
-            </div>
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
             >
-              {showPassword ? (
-                <EyeOff className="h-5 w-5 text-gray-400" />
-              ) : (
-                <Eye className="h-5 w-5 text-gray-400" />
-              )}
+              {showPassword ? <EyeOff /> : <Eye />}
             </button>
           </div>
-          {errors.password && (
-            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-          )}
+          {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
         </div>
 
         {!isLogin && (
           <div>
             <label htmlFor="transferPin" className="block text-sm font-medium text-gray-700">
-              Funds Transfer PIN (6 digits)
+              Transfer PIN
             </label>
-            <div className="mt-1 relative">
-              <input
-                type={showPin ? 'text' : 'password'}
-                id="transferPin"
-                name="transferPin"
-                maxLength={6}
-                value={formData.transferPin}
-                onChange={handleChange}
-                className={`block w-full pl-10 pr-10 py-2 border ${
-                  errors.transferPin ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Key className="h-5 w-5 text-gray-400" />
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowPin(!showPin)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              >
-                {showPin ? (
-                  <EyeOff className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-400" />
-                )}
-              </button>
-            </div>
-            {errors.transferPin && (
-              <p className="mt-1 text-sm text-red-600">{errors.transferPin}</p>
-            )}
-          </div>
-        )}
-
-        {isLogin && (
-          <div className="flex items-center justify-end">
-            <button type="button" className="text-sm text-blue-600 hover:text-blue-500">
-              Forgot password?
-            </button>
+            <input
+              type={showPin ? 'text' : 'password'}
+              id="transferPin"
+              name="transferPin"
+              value={formData.transferPin}
+              onChange={handleChange}
+              className={`block w-full mt-1 border ${errors.transferPin ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+            />
+            {errors.transferPin && <p className="mt-1 text-sm text-red-600">{errors.transferPin}</p>}
           </div>
         )}
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
         >
           {isLogin ? 'Sign In' : 'Create Account'}
         </button>
@@ -321,9 +248,7 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
             }}
             className="text-sm text-blue-600 hover:text-blue-500"
           >
-            {isLogin
-              ? "Don't have an account? Sign up"
-              : 'Already have an account? Sign in'}
+            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
           </button>
         </div>
       </form>
