@@ -36,6 +36,7 @@ const countries = [
 export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [showTransferPin, setShowTransferPin] = useState(false);
   const [errors, setErrors] = useState<Partial<SignupFormData & LoginFormData>>({});
   const [formData, setFormData] = useState<SignupFormData & LoginFormData>({
     fullName: '',
@@ -152,6 +153,31 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
               />
               {errors.referralCode && <p className="mt-1 text-sm text-red-600">{errors.referralCode}</p>}
             </div>
+
+            {/* Transfer PIN */}
+            <div>
+              <label htmlFor="transferPin" className="block text-sm font-medium text-gray-700">
+                Transfer PIN
+              </label>
+              <div className="relative mt-1">
+                <input
+                  type={showTransferPin ? 'text' : 'password'}
+                  id="transferPin"
+                  name="transferPin"
+                  value={formData.transferPin}
+                  onChange={handleChange}
+                  className={`block w-full pl-10 pr-10 border ${errors.transferPin ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowTransferPin(!showTransferPin)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showTransferPin ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
+                </button>
+              </div>
+              {errors.transferPin && <p className="mt-1 text-sm text-red-600">{errors.transferPin}</p>}
+            </div>
           </>
         )}
 
@@ -196,26 +222,23 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
           {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md"
         >
-          {isLogin ? 'Sign In' : 'Create Account'}
+          {isLogin ? 'Sign In' : 'Sign Up'}
         </button>
-
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setErrors({});
-            }}
-            className="text-sm text-blue-600 hover:text-blue-500"
-          >
-            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-          </button>
-        </div>
       </form>
+
+      <div className="flex justify-center space-x-4 mt-4">
+        <button
+          onClick={() => setIsLogin(!isLogin)}
+          className="text-blue-600"
+        >
+          {isLogin ? 'Create an Account' : 'Already have an Account?'}
+        </button>
+      </div>
     </div>
   );
 }
