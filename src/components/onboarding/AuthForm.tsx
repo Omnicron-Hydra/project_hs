@@ -36,6 +36,7 @@ const countries = [
 export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [showPin, setShowPin] = useState(false);
   const [errors, setErrors] = useState<Partial<SignupFormData & LoginFormData>>({});
   const [formData, setFormData] = useState<SignupFormData & LoginFormData>({
     fullName: '',
@@ -100,7 +101,7 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
         <p className="text-gray-600">
           {isLogin
             ? 'Sign in to access your account'
-            : 'Join our community and start earning.'}
+            : 'Join our community and start earning'}
         </p>
       </div>
 
@@ -172,26 +173,84 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
               </select>
               {errors.country && <p className="mt-1 text-sm text-red-600">{errors.country}</p>}
             </div>
-
-            <div>
-              <label htmlFor="referralCode" className="block text-sm font-medium text-gray-700">
-                Referral Code (Optional)
-              </label>
-              <input
-                type="text"
-                id="referralCode"
-                name="referralCode"
-                value={formData.referralCode}
-                onChange={handleChange}
-                className={`block w-full mt-1 border ${errors.referralCode ? 'border-red-300' : 'border-gray-300'} rounded-md`}
-              />
-              {errors.referralCode && <p className="mt-1 text-sm text-red-600">{errors.referralCode}</p>}
-            </div>
           </>
         )}
 
-        {/* Password and Submit Button */}
-        {/* ...rest of the form remains the same */}
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            Email Address
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`block w-full mt-1 border ${errors.email ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+          />
+          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            Password
+          </label>
+          <div className="mt-1 relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              {showPassword ? <EyeOff /> : <Eye />}
+            </button>
+          </div>
+          {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+        </div>
+
+        {!isLogin && (
+          <div>
+            <label htmlFor="transferPin" className="block text-sm font-medium text-gray-700">
+              Transfer PIN
+            </label>
+            <input
+              type={showPin ? 'text' : 'password'}
+              id="transferPin"
+              name="transferPin"
+              value={formData.transferPin}
+              onChange={handleChange}
+              className={`block w-full mt-1 border ${errors.transferPin ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+            />
+            {errors.transferPin && <p className="mt-1 text-sm text-red-600">{errors.transferPin}</p>}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+        >
+          {isLogin ? 'Sign In' : 'Create Account'}
+        </button>
+
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setErrors({});
+            }}
+            className="text-sm text-blue-600 hover:text-blue-500"
+          >
+            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+          </button>
+        </div>
       </form>
     </div>
   );
