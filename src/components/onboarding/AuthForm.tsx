@@ -36,7 +36,6 @@ const countries = [
 export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [showPin, setShowPin] = useState(false);
   const [errors, setErrors] = useState<Partial<SignupFormData & LoginFormData>>({});
   const [formData, setFormData] = useState<SignupFormData & LoginFormData>({
     fullName: '',
@@ -108,6 +107,7 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
       <form onSubmit={handleSubmit} className="space-y-4">
         {!isLogin && (
           <>
+            {/* Full Name and Username */}
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
                 Full Name
@@ -138,44 +138,25 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
               {errors.username && <p className="mt-1 text-sm text-red-600">{errors.username}</p>}
             </div>
 
+            {/* Referral Code */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                Phone Number
+              <label htmlFor="referralCode" className="block text-sm font-medium text-gray-700">
+                Referral Code (Optional)
               </label>
               <input
                 type="text"
-                id="phone"
-                name="phone"
-                value={formData.phone}
+                id="referralCode"
+                name="referralCode"
+                value={formData.referralCode}
                 onChange={handleChange}
-                className={`block w-full mt-1 border ${errors.phone ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+                className={`block w-full mt-1 border ${errors.referralCode ? 'border-red-300' : 'border-gray-300'} rounded-md`}
               />
-              {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-                Country
-              </label>
-              <select
-                id="country"
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-                className={`block w-full mt-1 border ${errors.country ? 'border-red-300' : 'border-gray-300'} rounded-md`}
-              >
-                <option value="">Select your country</option>
-                {countries.map((country) => (
-                  <option key={country} value={country}>
-                    {country}
-                  </option>
-                ))}
-              </select>
-              {errors.country && <p className="mt-1 text-sm text-red-600">{errors.country}</p>}
+              {errors.referralCode && <p className="mt-1 text-sm text-red-600">{errors.referralCode}</p>}
             </div>
           </>
         )}
 
+        {/* Email and Password */}
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email Address
@@ -195,62 +176,32 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
             Password
           </label>
-          <div className="mt-1 relative">
+          <div className="relative mt-1">
             <input
               type={showPassword ? 'text' : 'password'}
               id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? 'border-red-300' : 'border-gray-300'} rounded-md`}
+              className={`block w-full pl-10 pr-10 border ${errors.password ? 'border-red-300' : 'border-gray-300'} rounded-md`}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
             >
-              {showPassword ? <EyeOff /> : <Eye />}
+              {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
             </button>
           </div>
           {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
         </div>
 
-        {!isLogin && (
-          <div>
-            <label htmlFor="transferPin" className="block text-sm font-medium text-gray-700">
-              Transfer PIN
-            </label>
-            <input
-              type={showPin ? 'text' : 'password'}
-              id="transferPin"
-              name="transferPin"
-              value={formData.transferPin}
-              onChange={handleChange}
-              className={`block w-full mt-1 border ${errors.transferPin ? 'border-red-300' : 'border-gray-300'} rounded-md`}
-            />
-            {errors.transferPin && <p className="mt-1 text-sm text-red-600">{errors.transferPin}</p>}
-          </div>
-        )}
-
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none"
         >
           {isLogin ? 'Sign In' : 'Create Account'}
         </button>
-
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setErrors({});
-            }}
-            className="text-sm text-blue-600 hover:text-blue-500"
-          >
-            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-          </button>
-        </div>
       </form>
     </div>
   );
