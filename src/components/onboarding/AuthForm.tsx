@@ -100,7 +100,7 @@ export default function AuthForm({ onBack, onSuccess }: AuthFormProps) {
         <p className="text-gray-600">
           {isLogin
             ? 'Sign in to access your account'
-            : 'Join our community and start earning. this page is still under production so nothing will work yet'}
+            : 'Join our community and start earning.'}
         </p>
       </div>
 
