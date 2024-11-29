@@ -87,7 +87,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-900">
             {step === 'auth'
-              ? 'Welcome to CuratedHub'
+              ? 'Page in development! nothing will work for now.'
               : step === 'tasks'
               ? 'Remote Work Opportunities'
               : 'Get Started with CuratedHub'}
